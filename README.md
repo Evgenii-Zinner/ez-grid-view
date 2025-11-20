@@ -1,52 +1,83 @@
-# ez_grid_view
+# EZ Grid View
 
-A defensive, self-aware version of `GridView.builder` that won't crash when placed in an unbounded-height parent.
+A **crash-safe, self-aware** replacement for `GridView.builder` that prevents layout errors in `Column`, `Row`, `Flex`, and nested scroll views.
 
-## Problem
+## 🛑 The Problem
 
-Flutter's `GridView` is a powerful and efficient way to display scrollable lists of data. However, it has a major weakness: it requires its parent to provide bounded (finite) height. If you place a `GridView` inside a `Column` or `Row`, you'll get a layout crash with a cryptic error message.
+Flutter's `GridView` tries to expand to fill all available space in its scroll direction. When placed inside a parent with **unbounded constraints**, it breaks the layout.
 
-This is a common frustration for Flutter developers, especially newcomers. The fix is to wrap the `GridView` in a widget that provides bounded height, such as `Expanded` or `SizedBox`.
+Common scenarios that cause this crash:
+*   Placing a vertical grid inside a **`Column`**.
+*   Placing a horizontal grid inside a **`Row`**.
+*   Nesting it inside another **`ListView`**, **`CustomScrollView`**, or **`SingleChildScrollView`** (NestedListView scenario).
+*   Using it inside a **`Flex`** or unconstrained **`Card`**.
 
-## Solution
+Instead of a simple error, this often breaks the build process, causing the UI to vanish and spamming the console with:
+> "Vertical viewport was given unbounded height."
+> "RenderBox was not laid out: RenderViewport... NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE"
+> "Failed assertion: ... 'hasSize'"
 
-`EzGridView` is a drop-in replacement for `GridView.builder` that automatically handles this problem. It detects when it's in an unbounded-height environment and applies a fix to prevent the crash.
+## ✅ The EZ Solution
 
-In debug mode, it also provides a detailed error message in the console and a visual indicator (a red border) to let you know that a fix was applied. This helps you identify and fix the underlying layout issue.
+`EzGridView` is a defensive wrapper that detects these unbounded constraints before they cause damage:
 
-## Features
+*   **Auto-Detection:** Instantly identifies if it's in a `Column`, `Row`, or other unbounded parent.
+*   **Crash Prevention:** Automatically applies a safe, bounded size to ensure the widget renders visible content instead of breaking.
+*   **Developer Feedback:**
+    *   **Debug Mode:** Displays a **red border** and logs a clear warning identifying the exact parent causing the issue (e.g., "Unbounded height detected in Column").
+    *   **Release Mode:** Silently fixes the layout so your users never see a broken screen.
 
--   **Crash protection:** Automatically prevents layout crashes from unbounded height.
--   **Debug-friendly:** Provides detailed error messages and visual indicators in debug mode.
--   **Drop-in replacement:** Use it just like you would use `GridView.builder`.
--   **Lightweight:** No external dependencies.
+## ✨ Features
 
-## Usage
+*   **Drop-in Replacement:** Same API as `GridView.builder`.
+*   **Omni-Directional Safety:** Handles both unbounded height (Vertical) and width (Horizontal).
+*   **SEO & Discoverability:** Solves issues with `Column`, `Row`, `NestedListView`, `Flex`, and `Card`.
+*   **Zero Dependencies:** Lightweight and pure Flutter.
 
-Replace `GridView.builder` with `EzGridView.builder`:
+## 📦 Installation
 
-```dart
-// Before
-GridView.builder(
-  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,
-  ),
-  itemCount: 100,
-  itemBuilder: (context, index) => ListTile(title: Text('Item $index')),
-);
-
-// After
-EzGridView.builder(
-  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,
-  ),
-  itemCount: 100,
-  itemBuilder: (context, index) => ListTile(title: Text('Item $index')),
-);
+```shell
+flutter pub add ez_grid_view
 ```
 
-For a complete example, see the `example` directory.
+## 🚀 Usage
 
-## Contributing
+Simply replace `GridView.builder` with `EzGridView.builder`.
 
-Contributions are welcome! Please feel free to open an issue or submit a pull request.
+This normally crashes in a Column, but is safe with EzGridView:
+```dart
+Column(
+  children: [
+    Text('Header'),
+    EzGridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+      itemCount: 20,
+      itemBuilder: (context, index) => Card(child: Text('Item $index')),
+    ),
+  ],
+)
+```
+
+### The "Correct" Fix
+While `EzGridView` prevents the crash, the best practice is to provide constraints. `EzGridView` helps you find where this is needed:
+
+```dart
+Column(
+  children: [
+    Text('Header'),
+    Expanded(
+      child: EzGridView.builder(
+        // ...
+      ),
+    ),
+  ],
+)
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to open an issue or submit a pull request on [GitHub](https://github.com/Evgenii-Zinner/ez_grid_view).
+
+## 📜 License
+
+MIT License - see the [LICENSE](LICENSE) file for details.

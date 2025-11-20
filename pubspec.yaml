@@ -1,9 +1,20 @@
 name: ez_grid_view
-description: "A defensive, self-aware GridView.builder for Flutter that prevents layout crashes"
-version: 0.0.1
-homepage: https://github.com/Evgenii-Zinner/ez-grid-view/
-repository: https://github.com/Evgenii-Zinner/ez-grid-view/
+description: A crash-safe GridView that automatically handles unbounded height constraints in Columns and Rows.
+version: 0.0.2
+homepage: https://github.com/Evgenii-Zinner/ez-grid-view
+repository: https://github.com/Evgenii-Zinner/ez-grid-view
 issue_tracker: https://github.com/Evgenii-Zinner/ez-grid-view/issues
+documentation: https://flutter.ezinner.com/ez_grid_view
+topics:
+  - flutter
+  - ez-flutter
+  - gridview
+  - layout
+  - scrollable
+funding:
+  - https://github.com/sponsors/Evgenii-Zinner/
+  - https://thanks.dev/u/gh/evgenii-zinner
+  - https://buymeacoffee.com/evgeniizinner
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -17,5 +28,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
-flutter:
